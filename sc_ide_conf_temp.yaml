@@ -1,0 +1,6 @@
+IDE:
+  interpreter:
+    autoStart: true
+    configFile: /home/pi/supercolliderStandaloneRPI64/sclang.yaml
+    runtimeDir: /home/pi/supercolliderStandaloneRPI64
+    standalone: true
