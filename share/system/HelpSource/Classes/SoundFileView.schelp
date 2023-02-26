@@ -1,0 +1,759 @@
+class:: SoundFileView
+summary:: Sound file display
+categories:: GUI>Views
+related:: Classes/SoundFile
+
+
+DESCRIPTION::
+
+A sound file viewer with numerous options.
+
+Zoom in and out using Shift + right-click + mouse-up/down;
+
+Scroll using right-click + mouse-left/right.
+
+CLASSMETHODS::
+
+PRIVATE:: key
+
+
+INSTANCEMETHODS::
+
+SUBSECTION:: Data
+
+METHOD:: soundfile
+
+    argument::
+        An Instance of SoundFile to display.
+
+
+METHOD:: read
+
+    Reads a section of the link::#-soundfile:: and displays it in the view. For large files, you may want to use readWithTask instead.
+
+    The 'block' argument has no effect; the display resolution is infinite.
+
+    argument:: startFrame
+        The beginning of the section, in frames.
+
+    argument:: frames
+        The size of the section, in frames.
+
+    argument:: block
+        The block size - visual resolution of the display. An Integer of the form 2**n.
+
+    argument:: closeFile
+        If true, closes the SoundFile after reading.
+
+    argument:: doneAction
+        A Function called when the file reading has completed.
+
+
+METHOD:: readFile
+
+    Reads a section of an open instance of SoundFile, and displays it in the view. For large files, you may want to use the method readWithTask instead.
+
+   The 'block' argument has no effect; the display resolution is infinite.
+
+    argument:: aSoundFile
+        An open instance of SoundFile.
+
+    argument:: startFrame
+        The beginning of the section, in frames.
+
+    argument:: frames
+        The size of the section, in frames.
+
+    argument:: block
+        The block size - visual resolution of the display. An Integer of the form 2**n.
+
+    argument:: closeFile
+        If true, closes the SoundFile after reading.
+    argument:: doneAction
+        A Function called when the file reading has completed.
+
+METHOD:: readWithTask
+
+    Reads a section of the link::#-soundfile:: asynchronously (in the background), updating the link::#-readProgress:: along the way. If the code::showProgress:: argument is code::true::, a SoundFileViewProgressWindow opens to show the progress.
+
+   The 'block' argument has no effect; the display resolution is infinite. The 'showProgress' argument has no effect; the view always displays reading progress within itself.
+
+    argument:: startFrame
+        The beginning of the section, in frames.
+
+    argument:: frames
+        The size of the section, in frames.
+
+    argument:: block
+        The block size - visual resolution of the display. An Integer of the form 2**n.
+
+    argument:: doneAction
+        An optional function to be evaluated on completion.
+
+    argument:: showProgress
+        Whether to open a progress window. Defaults to code::true::.
+
+
+METHOD:: readFileWithTask
+
+    Reads a section of an open instance of SoundFile asynchronously (in the background), updating the link::#-readProgress:: along the way. If the code::showProgress:: argument is code::true::, a SoundFileViewProgressWindow opens to show the progress.
+
+        The 'block' argument has no effect; the display resolution is infinite.
+        The 'showProgress' argument has no effect; the view always displays reading progress within itself.
+
+    argument:: soundFile
+        An open instance of SoundFile.
+
+    argument:: startFrame
+        The beginning of the section, in frames.
+
+    argument:: frames
+        The size of the section, in frames.
+
+    argument:: block
+        The block size - visual resolution of the display. An Integer of the form 2**n.
+
+    argument:: doneAction
+        An optional function to be evaluated on completion.
+
+    argument:: showProgress
+        Whether to open a progress window. Defaults to code::true::.
+
+METHOD:: data
+
+    Sets custom data instead of a sound file. This is a setter only; it is not possible to get the data. If you need access to the data, you must keep it in your own variable.
+
+   Setting this property assumes 1 channel and sample rate of 44100 Hz. Use link::#-setData:: instead if you want more control.
+
+    argument::
+        An Array of Floats; multiple channel data should be interleaved.
+
+METHOD:: setData
+
+    Sets custom display data instead of a sound file, interpreting it using specified number of channels and sample rate.
+
+
+    argument:: data
+        An Array of Floats; multiple channel data should be interleaved.
+
+    argument:: block
+The block size - visual resolution of the display. An Integer of the form 2**n. (since the port to QT, the 'block' argument has no effect; the display resolution is infinite).
+
+    argument:: startFrame
+        An integer.
+
+    argument:: channels
+        An integer.
+
+    argument:: samplerate
+        An integer.
+
+METHOD:: alloc
+
+Allocates a desired amount of display channels and frames; all frames have initial value of 0.
+
+    argument:: frames
+        An Integer.
+    argument:: channels
+        An Integer.
+    argument:: samplerate
+        An Integer.
+
+METHOD:: set
+
+Overwrites a range of display data with another data. This method can be used after link::#-alloc:: or link::#-setData:: has been called, but not while the view is displaying a sound file.
+
+    argument:: offset
+        The frame at which to start overwriting; an Integer.
+    argument:: data
+        The new data; an Array of Floats; multiple channel data should be interleaved.
+
+METHOD:: startFrame
+
+    The beginning of the read section of the soundfile, or 0 if link::#-alloc:: or link::#-setData:: has been used.
+
+METHOD:: numFrames
+
+    The total amount of frames in the view; this is unrelated to link::#-zoom#zooming:: and link::#-scroll#scrolling::.
+
+METHOD:: readProgress
+
+     The reading progress, updated periodically when reading a soundfile using link::#-readWithTask:: or link::#-readFileWithTask::.
+
+SUBSECTION:: Navigation
+
+METHOD:: viewFrames
+
+    The amount of currently visible frames in the view.
+
+METHOD:: zoom
+
+    Zooms by a factor relative to current zoom.
+
+    argument::
+        A Float.
+
+METHOD:: zoomToFrac
+
+    Zooms to a specific scale.
+
+    argument::
+        A Float.
+
+METHOD:: zoomAllOut
+
+    Zooms to the link::#-currentSelection#current selection::.
+
+METHOD:: zoomSelection
+
+    Zooms to a specific selection.
+
+    argument::
+        The index of the selection; an Integer between 0 an 63.
+
+METHOD:: xZoom
+    The number of seconds of audio to display in the view. E.g., to zoom out by a factor of 2, code::view.xZoom = dataDuration / 2::. (You are responsible for keeping track of the data duration.)
+
+    returns:: A Float, in seconds of audio displayed.
+
+METHOD:: yZoom
+    Vertical scaling. The default code::yZoom = 1:: sets ±1.0 to the top and bottom of the view. If code::yZoom = 2::, the view covers ±0.5 of the value range.
+
+    returns:: A Float scaling factor.
+
+METHOD:: yOffset
+    Vertical offset. The default code::yOffset = 0:: sets value of 0.0 in the middle of the channel's view, while code::yOffset = 1::, sets 0.0 at the top and code::yOffset = -1:: sets 0.0 at the bottom of the view. This is performed after (and thus is not scaled by) the link::#-yZoom:: factor.
+
+    returns:: A Float offset.
+
+METHOD:: spacing
+    A ratio between vertical space outside of the ±1.0 value range and channel's full height. The default code::spacing = 0.1:: makes top and bottom spaces add up to code::0.1 * height:: (each of them occupying half of that), while ±1.0 value range occupies code::0.9 * height::. The value is clipped in the range from code::0.0:: to  code:: 1.0::.
+
+    returns:: A Float scaling factor.
+
+METHOD:: scrollPos
+
+    The scrolling position of the view, as a fraction of the total scrolling range. The total scrolling range is code::totalDuration - xZoom::.
+
+    returns::
+        A Float in the range of 0.0 to 1.0.
+
+METHOD:: scrollTo
+
+    Scrolls to a fraction of the total scrolling range. The total scrolling range is code::totalDuration - xZoom::.
+
+    argument::
+        A Float in the range of 0.0 to 1.0.
+
+METHOD:: scroll
+
+    Scrolls by a fraction of the visible range.
+
+    argument::
+        A Float.
+
+METHOD:: scrollToStart
+
+    Scrolls to the beginning.
+
+METHOD:: scrollToEnd
+
+    Scrolls to the end.
+
+SUBSECTION:: Selection
+
+METHOD:: selections
+
+    All the selections.
+
+    returns:: An array of 64 arrays of start frames and sizes: [ [ start0, size0 ] , [ start1, size1 ], ... ].
+
+METHOD:: selection
+
+    The selection at index.
+
+    returns::
+        An Array of the form code::[start, size]::, where start and size denote frames.
+
+METHOD:: setSelection
+
+    Sets the selection at index.
+
+    argument:: index
+        An Integer between 0 an 63.
+
+    argument:: selection
+        An Array of the form code::[start, size]::, where start and size are Integers and denote frames.
+
+METHOD:: currentSelection
+
+    The index of the current selection
+
+    argument::
+        An integer between 0 an 63.
+
+METHOD:: selectionStart
+
+    The start frame of a selection.
+
+    argument:: index
+        The index of the selection; an Integer between 0 an 63.
+
+    returns::
+        An Integer.
+
+METHOD:: setSelectionStart
+
+    Sets the start frame of a selection.
+
+    argument:: index
+        The index of the selection; an Integer between 0 an 63.
+
+    argument:: frame
+        The starting frame of the selection, an Integer.
+
+METHOD:: selectionSize
+
+    The size of a selection.
+
+    argument:: index
+        The index of the selection; an Integer between 0 an 63.
+
+    returns::
+        An Integer.
+
+METHOD:: setSelectionSize
+
+    Sets the size of a selection.
+
+    argument:: index
+        The index of the selection; an Integer between 0 an 63.
+
+    argument:: frames
+        The size in frames of the selection, an Integer.
+
+METHOD:: selectionStartTime
+
+    The start of a selection in seconds.
+
+    argument:: index
+        The index of the selection; an Integer between 0 an 63.
+
+    returns::
+        A Float.
+
+METHOD:: selectionDuration
+
+    The size of a selection in seconds.
+
+    argument:: index
+        The index of the selection; an Integer between 0 an 63.
+
+    returns::
+        A Float.
+
+METHOD:: selectAll
+
+    Sets a selection to span the whole data range.
+
+    argument:: index
+        The index of the selection; an Integer between 0 an 63.
+
+
+METHOD:: selectNone
+
+    Sets the size of a selection to 0.
+
+    argument:: index
+        The index of the selection; an Integer between 0 an 63.
+
+METHOD:: setSelectionColor
+
+    Sets the color of a selection.
+
+    argument:: index
+        The index of the selection; an Integer between 0 an 63.
+
+    argument:: color
+        A Color.
+
+METHOD:: setEditableSelectionStart
+
+    Sets whether the start point of a selection can be edited.
+
+    argument:: index
+        The index of the selection; an Integer between 0 an 63.
+
+    argument:: editable
+        A Boolean.
+
+METHOD:: setEditableSelectionSize
+
+    Whether the end point of a selection can be edited.
+
+    argument:: index
+        The index of the selection; an Integer between 0 an 63.
+
+    argument:: editable
+        A Boolean.
+
+METHOD:: readSelection
+
+    note:: Not implemented ::
+
+    Read the data within a selection.
+
+    argument:: block
+        The block size - visual resolution of the display. An Integer of the form 2**n.
+
+    argument:: closeFile
+        If true, closes the SoundFile after reading.
+
+METHOD:: readSelectionWithTask
+
+    note:: Not implemented ::
+
+    Read the data within the current selection asynchronously (in the background), showing the progress in a separate window.
+
+
+SUBSECTION:: Display
+
+METHOD:: peakColor
+
+    The color of the peak-to-peak data. This can be overridden by link::#-waveColors::. Defaults to code::Color(0.95, 0.7)::.
+
+    argument::
+        A code::Color::.
+
+METHOD:: rmsColor
+
+    The color of the RMS data. Defaults to code::Color(1.0, 1.0)::.
+
+    argument::
+        A code::Color::.
+
+METHOD:: waveColors
+
+    An array of colors for the peak-to-peak data for each channel, allowing each channel to be represented by a different color. Defaults to code::[ ]::. Once set, it overrides link::#-peakColor::. In order to revert to using code::.peakColor::, set code::.waveColors:: back to an empty array: code::.waveColors_([])::.
+
+    note::link::#-rmsColor:: stays the same for all channels. However, using alpha blending, it is possible to display RMS data using either a lighter (e.g. code::.rmsColor_(Color.grey(1, 0.3))::) or a darker (e.g. code::.rmsColor_(Color.grey(0, 0.3))::) shade of the peak-to-peak color.::
+
+    argument::
+        And array of code::[Color]::.
+
+METHOD:: gridOn
+
+    Whether the grid is displayed. Defaults to code::true::.
+
+    argument::
+        A Boolean.
+
+METHOD:: gridResolution
+
+    The resolution of the grid.
+
+    argument::
+        An instance of Float.
+
+METHOD:: gridOffset
+
+    Sets the grid offset.
+
+    argument::
+        Grid blocks are offset by this value (in seconds).
+
+METHOD:: gridColor
+
+    The color of the grid.
+
+    argument::
+        A Color.
+
+METHOD:: drawsWaveForm
+
+    Whether the data is displayed. Defaults to code::true::.
+
+    argument::
+        A Boolean.
+
+METHOD:: drawsRMS
+
+    Whether the RMS data for the waveform is displayed. Defaults to code::true::.
+
+METHOD:: drawsCenterLine
+
+    Whether the center line (at value 0.0) is displayed. Defaults to code::true::.
+
+    argument::
+        A Boolean.
+
+METHOD:: drawsBoundingLines
+
+    Whether the bounding lines (at values ±1.0) are displayed. Defaults to code::true::.
+
+    argument::
+        A Boolean.
+
+METHOD:: timeCursorOn
+
+    Whether the time cursor is displayed. Defaults to code::false::.
+
+    argument::
+        A Boolean.
+
+METHOD:: timeCursorPosition
+
+    The position of the time cursor in frames.
+
+    argument::
+        An Integer.
+
+METHOD:: timeCursorColor
+
+    The color of the time cursor.
+
+    argument::
+        A Color.
+
+METHOD:: elasticMode
+
+    Not operational, for compatibility only.
+
+SUBSECTION:: Actions
+
+METHOD:: action
+
+    The object to be evaluated whenever the user interacts with the view.
+
+METHOD:: metaAction
+
+    The object to be evaluated on Ctrl + click.
+
+
+EXAMPLES::
+
+SUBSECTION:: Basic example
+
+code::
+
+// To zoom in/out: Shift + right-click + mouse-up/down
+// To scroll: right-click + mouse-left/right
+(
+w = Window.new("soundfile test", Rect(200, 300, 740, 100));
+a = SoundFileView.new(w, Rect(20,20, 700, 60));
+
+f = SoundFile.new;
+f.openRead(Platform.resourceDir +/+ "sounds/a11wlk01.wav");
+f.inspect;
+
+a.soundfile = f;
+a.read(0, f.numFrames);
+
+a.timeCursorOn = true;
+a.timeCursorColor = Color.red;
+a.timeCursorPosition = 2050;
+a.drawsWaveForm = true;
+a.gridOn = true;
+a.gridResolution = 0.2;
+
+w.front;
+)
+::
+
+SUBSECTION:: Step by step examples
+
+code::
+( // make a simple SoundFileView
+y = Window.screenBounds.height - 120;
+w = Window.new("soundfile test", Rect(200, y, 740, 100)).alwaysOnTop_(true);
+w.front;
+a = SoundFileView.new(w, Rect(20,20, 700, 60));
+
+f = SoundFile.new;
+f.openRead(Platform.resourceDir +/+ "sounds/a11wlk01.wav");
+// f.inspect;
+
+a.soundfile = f;            // set soundfile
+a.read(0, f.numFrames);     // read in the entire file.
+a.refresh;                  // refresh to display the file.
+)
+
+// To zoom in/out: Shift + right-click + mouse-up/down
+// To scroll: right-click + mouse-left/right
+
+// reading file
+a.read(0, f.numFrames / 2).refresh; // read first half
+a.read.refresh;                     // read entire file by default
+a.read(f.numFrames / 2).refresh;    // read second half
+a.read(0, -1).refresh;              // -1 also reads entire file, like buffer.
+
+// the resolution of the view is always infinite;
+// you can always zoom in until you see a single sample.
+
+a.read(0, -1).refresh;
+
+// for longer files, you can use:
+a.readWithTask;
+
+// zoom is relative
+a.zoom(0.2).refresh;
+a.zoom(2).refresh;
+a.zoom(2).refresh;
+a.zoomToFrac(0.5); // zoom to half file size
+a.zoomAllOut;
+
+a.gridOn = true;            // time grid, 1 second by default,
+a.gridResolution = 0.2;     // or set resolution in seconds
+a.gridColor = Color.cyan;   // color is changeable.
+a.gridOffset_(0.1);         // not sure if this is working?
+
+a.timeCursorOn = true;          // a settable cursor
+a.timeCursorPosition = 2050;    // position is in frames.
+a.timeCursorColor = Color.white;
+
+// toggle drawing on/off
+a.drawsWaveForm = false;
+a.drawsWaveForm = true;
+
+// these methods should return view properties:
+a.gridOn
+a.gridResolution
+a.gridColor
+a.timeCursorOn
+a.timeCursorPosition
+a.timeCursorColor
+
+// Selections: multiple selections are supported.
+// e.g. use selection 0:
+a.setSelectionColor(0, Color.red);  // set...( index, value )
+a.selectionStart(0);                // at index
+a.setSelectionStart(0, 12345);
+a.setSelectionSize(0, 12345);
+
+a.setSelectionStart(0, 1234);
+a.selectionStart(0);
+
+// now selection 1
+a.setSelectionColor(1, Color.white);
+a.setSelectionStart(1, 1234).setSelectionSize(1, 1234 * 2);
+a.selectionStart(1);
+a.setSelectionStart(0, 12345);
+
+// the current selection gets changed when click/dragging in view.
+a.currentSelection;     // index of current selection;
+a.currentSelection_(1); // switch current selection - try click/drag white now.
+a.currentSelection;
+
+a.selections.size;      // 64 selections
+a.selections[0];
+a.selections[1];
+a.selections;
+
+// setSelection (index, selection);
+a.setSelection(0, [234, 2345]);
+a.selection(1); // returns [start, size].
+
+(       // mouseUpAction
+a.mouseUpAction = {
+    ("mouseUp, current selection is now:"
+        + a.selections[a.currentSelection]).postln;
+};
+)
+// lock selection 0:
+a.currentSelection_(0);
+a.setEditableSelectionStart(0, false);
+a.setEditableSelectionSize(0, false);
+
+
+// unlock selection 0:
+a.setEditableSelectionStart(0, true);
+a.setEditableSelectionSize(0, true);
+
+a.selectionStartTime(0);
+a.selectionDuration(0);
+
+
+a.setSelectionStart(0, 12345);
+a.setSelectionSize(0, 12345);
+a.readSelection.refresh;
+a.readSelection(16).refresh;    // in higher resolution
+a.read.refresh;                 // go back to entire file.
+
+
+a.dataNumSamples;   // visual data have this many points
+a.data.plot;
+a.setData(a.data.reverse);
+
+
+a.zoom(0.25);       // scrolling is normalized
+a.scrollTo(0.5);    //
+a.scrollTo(0.6);    //
+a.scroll(12);       // scroll is in viewFrames.
+
+a.zoom(4);
+
+w.close;
+
+::
+
+SUBSECTION:: Adding a scroll bar
+
+Zooming and scrolling by mouse, directly in a SoundFileView, may not be immediately intuitive. (Most users wouldn't guess to shift-right-click!) You can add a link::Classes/RangeSlider:: to act as a scrollbar.
+
+Notes:
+
+list::
+## If the user shift-right-clicks, the only way to track the SoundFileView's display changes is by using mouse actions: link::Classes/View#-mouseDownAction:: and link::Classes/View#-mouseUpAction:: to know which button is pressed, and link::Classes/View#-mouseMoveAction:: to read the new scrolling and zooming values.
+## link::Classes/SoundFileView#-xZoom:: is in seconds, while the range slider is normalized to a 0-1 range. So code::xZoom == slider.range * duration::, and code::slider.range == xZoom / duration::.
+## link::Classes/SoundFileView#-scrollPos:: is normalized to the "total scrolling range," where 1.0 is scrolled fully to the right. We have to subtract the displayed area: code::slider.lo = sfv.scrollPos / (1 - slider.size)::, with some refinements to avoid division by 0.
+::
+
+code::
+
+f = SoundFile.openRead(Platform.resourceDir +/+ "sounds/a11wlk01.wav");
+f.readData(d = Signal.newClear(f.numFrames * f.numChannels));
+f.close;
+
+(
+var w = Window("test", Rect(700, 200, 600, 300)),
+sfv, sfZoom, mouseButton,
+dur = d.size / f.sampleRate / f.numChannels;
+
+w.layout = VLayout(
+	sfv = SoundFileView(),
+	sfZoom = RangeSlider().orientation_(\horizontal)
+);
+
+sfZoom.lo_(0).range_(1)
+.action_({ |view|
+	var divisor, rangeStart;
+	rangeStart = view.lo;
+	divisor = 1 - sfZoom.range;
+	if(divisor < 0.0001) {
+		rangeStart = 0;
+		divisor = 1;
+	};
+	sfv.xZoom_(sfZoom.range * dur)
+	.scrollTo(rangeStart / divisor)
+});
+
+sfv.setData(d, startFrame: 0, channels: f.numChannels, samplerate: f.sampleRate);
+
+sfv.mouseDownAction_({ |view, x, y, mod, buttonNumber|
+	mouseButton = buttonNumber;
+})
+.mouseUpAction_({ |view, x, y, mod|
+	mouseButton = nil;
+})
+.mouseMoveAction_({ |view, x, y, mod|
+	var rangeSize, rangeStart;
+	if(mouseButton == 1) {
+		rangeSize = view.xZoom / dur;
+		rangeStart = view.scrollPos * (1 - rangeSize);
+		sfZoom.lo_(rangeStart).range_(rangeSize);
+	};
+});
+
+w.front;
+)
+::

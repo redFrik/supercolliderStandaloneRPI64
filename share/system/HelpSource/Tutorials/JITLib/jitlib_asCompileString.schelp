@@ -1,0 +1,89 @@
+title:: jitlib_asCompileString
+summary:: asCompileString in JITLib
+categories:: JITLib>Tutorials
+
+code::
+{ 10 + 6 * ~harry }.asCompileString;
+::
+
+Many objects understand strong::.storeOn::, which a way to post their string that is needed to reproduce them by compilation. Sometimes one wants to store a certain configuration of a proxy space, which can be done
+if all functions used are closed functions.
+
+code::
+// an example how ProxySpace can document its current state:
+
+p = ProxySpace.push(s);
+
+
+(
+~ctl1 = {
+	var z = 1;
+	4.do { |i| z = z * SinOsc.kr(i.sqrt, i+[0,0.2]) };
+	z
+};
+
+~ctl2[0] = { LFNoise2.kr([20,20],20) };
+~ctl2[1] = {
+	LFNoise2.kr([20,20],20) * LFNoise0.kr([20,20],20)
+};
+
+~out = {
+	SinOsc.ar(~freq.kr, 0, 0.1)
+};
+
+~freq[0] = { ~ctl1.kr(2) + ~ctl2.kr(2) + 400 };
+~freq[5] = ~ctl1.wrap2(~ctl2) * ~ctl1 / (~ctl2 + ~ctl1);
+
+~pat = Pbind(\freq, Pfunc({ 1.2.rand }));
+~z = 9;
+~out.set(\freq, 760, \ffreq, 20);
+)
+
+p.asCompileString;
+
+// the document message creates a new document which it posts the code into
+
+p.document;		// document everything
+p.document([\out]); 	// document all dependants of ~out
+p.document([\ctl1]);	// document all dependants of ~ctl1
+::
+
+Ndefs and NodeProxies can also store their full state as a code string:
+code::
+// Ndef with source
+Ndef(\x, { Saw.ar(\freq.kr(234), 0.1) });
+Ndef(\x).asCode;
+// returns:
+"Ndef('x', { Saw.ar(\freq.kr(234), 0.1) });
+"
+
+// Ndef with source and settings
+Ndef(\a,  { Saw.ar(\freq.kr, 0.1) }).set(\freq, 123);
+Ndef(\a).asCode;
+// returns:
+"(
+Ndef('a', { Saw.ar(\freq.kr, 0.1) });
+Ndef('a').set('freq', 123);
+);
+"
+
+// anonymous nodeproxy - returns example code with interpreter variable "a = ..."
+z = NodeProxy.new.source = { DC.ar };
+z.asCode
+// returns:
+"a = NodeProxy.new.source_({ DC.ar });"
+
+// nodeproxy  in a pushed proxyspace, which is also playing
+p = ProxySpace.push(s);
+~x = { Saw.ar(\freq.kr(234), 0.1) };
+~x.play;
+~x.asCode;
+// returns code that assumes there is a pushed proxyspace:
+"(
+~x = { Saw.ar(\freq.kr(234), 0.1) };
+~x.play;
+);
+"
+~x.end.clear;
+p.pop; p.clear;
+::
